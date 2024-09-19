@@ -20,7 +20,9 @@ RUN apt install -y curl
 # install dependencies
 RUN npm init -y \
     npm i @aws-sdk/client-s3 \
-    npm i dotenv
+    npm i dotenv \
+    npm install multer \
+    npm install aws-sdk
 
 # run backend
 RUN node server.js
