@@ -1,7 +1,6 @@
 require("dotenv").config();
 const S3 = require("@aws-sdk/client-s3");
 const S3Presigner = require("@aws-sdk/s3-request-presigner");
-
 const bucketName = 'n11092505-assessment-2'
 const s3Client = new S3.S3Client({ region: 'ap-southeast-2' });
 
@@ -34,6 +33,13 @@ const uploadFile = async (folder, fileName, contentType) => {
 // provide endpoint to download file from s3, send signed url to front end
 // when the user requests a given {file id}, generate a signed url for the file at {user sub}/{file id}
 const downloadFile = async (folder, fileName) => {
+    // TODO: Implement the cache
+    // check if signed url is in cache or expired already
+    // if it is, return the signed url
+    // if not, generate a new signed url
+    // store the signed url in cache
+    // return the signed url
+
     // Create a pre-signed URL for getting an object
     try {
         const command = new S3.GetObjectCommand({
@@ -71,7 +77,6 @@ const listFiles = async (folder) => {
 // delete file (file id) returns ()
 // provide endpoint to delete file from s3
 // delete file at {user sub}/{file id} using the s3 sdk
-
 
 
 module.exports = {

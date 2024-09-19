@@ -22,7 +22,9 @@ RUN npm init -y \
     npm i @aws-sdk/client-s3 \
     npm i dotenv \
     npm install multer \
-    npm install aws-sdk
+    npm install aws-sdk \
+    npm i @aws-sdk/client-dynamodb \
+    npm i @aws-sdk/lib-dynamodb  
 
 # run backend
 RUN node server.js

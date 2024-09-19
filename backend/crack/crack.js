@@ -1,6 +1,7 @@
 const { spawn } = require('node:child_process');
 const S3 = require("@aws-sdk/client-s3");
 const fs = require('fs');
+const { putItemInDynamoDB } = require('./db');
 
 // Creating a client for sending commands to S3
 const s3Client = new S3.S3Client({ region: 'ap-southeast-2' });
@@ -9,13 +10,14 @@ const bucketName = 'n11092505-assessment-2';
 
 // crack (encrypted_file_id, res) returns (output)
 const crackFile = async (folder, fileName, mask, res) => {
+    const s3FileName = `${folder}/${fileName}`;
     const localInputFileName = `${folder}-${fileName}`;
     const localOutputFileName = `${folder}-${fileName}.cracked`;
     // the user will provide the encrypted file name
     // the server will download the files from s3
     const command = new S3.GetObjectCommand({
         Bucket: bucketName,
-        Key: `${folder}/${fileName}`,
+        Key: s3FileName,
     });
     const { Body } = await s3Client.send(command);
 
@@ -34,11 +36,14 @@ const crackFile = async (folder, fileName, mask, res) => {
         '-m',
         '1700',
         '-O',
+        '--potfile-disable',
         '--status', 
         '--status-timer',
         '10',
         '--outfile',
         localOutputFileName,
+        '--outfile-format',
+        '2',
         localInputFileName,
         mask,
     ]);
@@ -58,12 +63,15 @@ const crackFile = async (folder, fileName, mask, res) => {
         res.end();
         console.log(`child process exited with code ${code}`);
         if (code === 0) {
-            const command = new S3.PutObjectCommand({
-                Bucket: bucketName,
-                Key: `${folder}/${fileName}.cracked`,
-                Body: fs.createReadStream(localOutputFileName),
+            const crackedPassword = fs.readFileSync(localOutputFileName, 'utf8');
+            await putItemInDynamoDB(folder, s3FileName, {
+                password: crackedPassword,
+                timeCracked: new Date().toISOString(),
             });
-            await s3Client.send(command);
+            // delete the local files
+            fs.unlinkSync(localInputFileName);
+            fs.unlinkSync(localOutputFileName);
+
         }
     });
     // the server will return the output
