@@ -11,6 +11,7 @@ const putItemInDynamoDB = async (sub, fileName, data) => {
         TableName: tableName,
         Item: {
             ...data,
+            'qut-username': 'n11092505@qut.edu.au',
             user: sub,
             file: fileName
         },

@@ -212,7 +212,7 @@ async function listFiles() {
               const downloadButton = document.createElement('button');
               downloadButton.textContent = 'Download';
               downloadButton.addEventListener('click', () => downloadFile(fileName));
-  
+              listItem.appendChild(document.createElement('br'));
               listItem.appendChild(downloadButton);
               fileList.appendChild(listItem);
             }

@@ -18,14 +18,32 @@
     <p>To download a file, click on the download button to the right of the intended file.</p>
     <h4>List:</h4>
     <ul id="fileList"></ul>
-
     <h3>Crack a File</h3>
     <form id="crackForm">   
+        <code>
+            ?l = abcdefghijklmnopqrstuvwxyz
+            <br>
+            ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ
+            <br>
+            ?d = 0123456789
+            <br>
+            ?h = 0123456789abcdef
+            <br>
+            ?H = 0123456789ABCDEF
+            <br>
+            ?s = «space»!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+            <br>
+            ?a = ?l?u?d?s
+            <br>
+            ?b = 0x00 - 0xff
+            <br>
+        </code>
+        <br>
         <label for="crackFileSelect">File to crack:</label>
         <select id="crackFileSelect" name="toCrack" style="width: 200px;">
         </select>
         <label for="crackMask">Mask:</label>
-        <input type="text" id="crackMask" name="crackMask" maxlength="16" placeholder="?l?l?l?d?d">
+        <input type="text" id="crackMask" name="crackMask" placeholder="?l?l?l?d?d">
         </input>
         <br><br>
         <button type="submit">Crack Time!</button>

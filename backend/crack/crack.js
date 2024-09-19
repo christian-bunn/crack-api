@@ -60,6 +60,7 @@ const crackFile = async (folder, fileName, mask, res) => {
     });
 
     hashcat.on('close', async (code) => {
+        res.status(200);
         res.end();
         console.log(`child process exited with code ${code}`);
         if (code === 0) {
