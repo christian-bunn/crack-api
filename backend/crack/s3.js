@@ -3,9 +3,6 @@ const S3 = require("@aws-sdk/client-s3");
 const S3Presigner = require("@aws-sdk/s3-request-presigner");
 
 const bucketName = 'n11092505-assessment-2'
-
-
-// Creating a client for sending commands to S3
 const s3Client = new S3.S3Client({ region: 'ap-southeast-2' });
 
 // note: store the files in s3 based on username ("sub": "d9ae4408-f031-7010-d902-7422e61d7ad2") - sub means subject and is the id of the user

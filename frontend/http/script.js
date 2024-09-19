@@ -172,9 +172,15 @@ if (uploadForm) {
 // List files function
 async function listFiles() {
     const fileList = document.getElementById('fileList');
-    if (!fileList) return;
+    const crackFileSelect = document.getElementById('crackFileSelect');
+    
+    // If neither element exists, exit the function
+    if (!fileList && !crackFileSelect) return;
   
-    fileList.innerHTML = ''; // Clear existing list
+    // Clear existing content
+    if (fileList) fileList.innerHTML = '';
+    if (crackFileSelect) crackFileSelect.innerHTML = '';
+  
     const accessToken = localStorage.getItem('accessToken');
   
     try {
@@ -189,26 +195,55 @@ async function listFiles() {
   
       if (response.ok) {
         if (files.length === 0) {
-          fileList.textContent = 'No files for this user.';
+          if (fileList) fileList.textContent = 'No files for this user.';
+          if (crackFileSelect) {
+            const option = document.createElement('option');
+            option.textContent = 'No files available';
+            option.disabled = true;
+            crackFileSelect.appendChild(option);
+          }
         } else {
           files.forEach(fileName => {
-            const listItem = document.createElement('li');
-            listItem.textContent = fileName;
+            // Populate fileList
+            if (fileList) {
+              const listItem = document.createElement('li');
+              listItem.textContent = fileName;
   
-            const downloadButton = document.createElement('button');
-            downloadButton.textContent = 'Download';
-            downloadButton.addEventListener('click', () => downloadFile(fileName));
+              const downloadButton = document.createElement('button');
+              downloadButton.textContent = 'Download';
+              downloadButton.addEventListener('click', () => downloadFile(fileName));
   
-            listItem.appendChild(downloadButton);
-            fileList.appendChild(listItem);
+              listItem.appendChild(downloadButton);
+              fileList.appendChild(listItem);
+            }
+  
+            // Populate crackFileSelect
+            if (crackFileSelect) {
+              const option = document.createElement('option');
+              option.value = fileName;
+              option.textContent = fileName;
+              crackFileSelect.appendChild(option);
+            }
           });
         }
       } else {
-        fileList.textContent = 'Failed to retrieve files.';
+        if (fileList) fileList.textContent = 'Failed to retrieve files.';
+        if (crackFileSelect) {
+          const option = document.createElement('option');
+          option.textContent = 'Failed to retrieve files';
+          option.disabled = true;
+          crackFileSelect.appendChild(option);
+        }
       }
     } catch (error) {
       console.error('Error listing files:', error);
-      fileList.textContent = 'An error occurred while listing files.';
+      if (fileList) fileList.textContent = 'An error occurred while listing files.';
+      if (crackFileSelect) {
+        const option = document.createElement('option');
+        option.textContent = 'Error loading files';
+        option.disabled = true;
+        crackFileSelect.appendChild(option);
+      }
     }
 }
 
@@ -246,3 +281,49 @@ document.addEventListener('DOMContentLoaded', () => {
         listFiles();
     }
 });
+
+const responseContainer = document.getElementById('crackOutput');
+const crackForm = document.getElementById('crackForm');
+if (crackForm) {
+  crackForm.addEventListener('submit', async function(event) {
+    event.preventDefault();
+    responseContainer.innerHTML = '';
+    const crackFileSelect = document.getElementById('crackFileSelect');
+    const crackMask = document.getElementById('crackMask');
+    const mask = crackMask.value;
+    const fileName = crackFileSelect.value;
+    const accessToken = localStorage.getItem('accessToken');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/crack/start`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + accessToken,
+        },
+        body: JSON.stringify({ fileName, mask }),
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      let done = false;
+      while (!done) {
+          const { value, done: streamDone } = await reader.read();
+          done = streamDone;
+          const chunk = decoder.decode(value, { stream: !done });
+          responseContainer.innerHTML += chunk;  // Append the chunk to the div
+      }
+
+      if (response.ok) {
+        // Display the cracking result to the user
+        console.warn(`Cracking completed:\n${result.result}`);
+      } else {
+        console.warn(`Cracking failed: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('Error starting crack:', error);
+      console.warn('An error occurred while starting the crack.');
+    }
+  });
+}

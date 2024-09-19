@@ -4,6 +4,7 @@ const { confirmSignUp } = require('./cognito/confirm');
 const { authenticateUser } = require('./cognito/authenticate');
 const { uploadFile, downloadFile, listFiles } = require('./crack/s3');
 const { authenticateMiddleware } = require('./cognito/jwt_middleware_verify');
+const { crackFile } = require('./crack/crack');
 
 const app = express();
 app.use(express.json());
@@ -88,6 +89,16 @@ app.get('/download/:filename', authenticateMiddleware, async (req, res) => {
   }
 });
 
+app.post('/crack/start', authenticateMiddleware, async (req, res) => {
+  try {
+    const folder = req.user.sub;
+    const { fileName, mask } = req.body;
+    await crackFile(folder, fileName, mask, res);
+  } catch (error) {
+    console.error('Error cracking', error);
+    res.status(500).json({ message: 'Failed to crack' });
+  }
+});
 
 // Status endpoint to check if server is running
 app.get('/status', (req, res) => {
