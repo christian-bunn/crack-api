@@ -3,7 +3,6 @@ const DynamoDB = require("@aws-sdk/client-dynamodb");
 const DynamoDBLib = require("@aws-sdk/lib-dynamodb");
 const client = new DynamoDB.DynamoDBClient({ region: "ap-southeast-2" });
 const docClient = DynamoDBLib.DynamoDBDocumentClient.from(client);
-const qutUsername = 'n11092505@qut.edu.au';
 const tableName = 'n11092505-assessment2-file-metadata';
 
 // function for putting an object in dynamodb
@@ -12,7 +11,6 @@ const putItemInDynamoDB = async (sub, fileName, data) => {
         TableName: tableName,
         Item: {
             ...data,
-            "qut-username": qutUsername,
             user: sub,
             file: fileName
         },
