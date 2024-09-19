@@ -1,20 +1,7 @@
 const Cognito = require("@aws-sdk/client-cognito-identity-provider");
-const jwt = require("aws-jwt-verify");
 
-const userPoolId = "ap-southeast-2_mur9gJo4c"; // Obtain from AWS console
-const clientId = "7outo577k5qf43qegboraga6kr"; // match signUp.js
-
-const accessVerifier = jwt.CognitoJwtVerifier.create({
-  userPoolId: userPoolId,
-  tokenUse: "access",
-  clientId: clientId,
-});
-
-const idVerifier = jwt.CognitoJwtVerifier.create({
-  userPoolId: userPoolId,
-  tokenUse: "id",
-  clientId: clientId,
-});
+const userPoolId = "ap-southeast-2_mur9gJo4c";
+const clientId = "7outo577k5qf43qegboraga6kr";
 
 async function authenticateUser(username, password) {
   const client = new Cognito.CognitoIdentityProviderClient({
@@ -32,13 +19,11 @@ async function authenticateUser(username, password) {
     });
 
     const res = await client.send(command);
-    const accessToken = await accessVerifier.verify(res.AuthenticationResult.AccessToken);
-    const idToken = await idVerifier.verify(res.AuthenticationResult.IdToken);
-
-    console.log("Access Token Verified:", accessToken);
-    console.log("ID Token Verified:", idToken);
-
-    return { accessToken, idToken };
+    // Return the tokens as strings
+    return {
+      accessToken: res.AuthenticationResult.AccessToken,
+      idToken: res.AuthenticationResult.IdToken,
+    };
   } catch (error) {
     console.error("Error during authentication:", error.message);
     throw new Error(error.message);

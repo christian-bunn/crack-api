@@ -117,12 +117,22 @@ if (uploadForm) {
     const file = fileInput.files[0];
     const uploadMessage = document.getElementById('uploadMessage');
 
+    // Retrieve the access token from localStorage
+    const accessToken = localStorage.getItem('accessToken');
+
+    // Check if accessToken exists
+    if (!accessToken) {
+      uploadMessage.textContent = 'You are not logged in. Please log in to upload files.';
+      return;
+    }
+
     try {
-      // getting presigned url
+      // Getting presigned URL
       const response = await fetch(`${API_BASE_URL}/upload`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + accessToken,
         },
         body: JSON.stringify({ fileName: file.name, contentType: file.type }),
       });
@@ -132,7 +142,7 @@ if (uploadForm) {
       if (response.ok) {
         const presignedURL = result.url;
 
-        // uploading file to s3 through presigned url
+        // Uploading file to S3 through presigned URL
         const uploadResponse = await fetch(presignedURL, {
           method: 'PUT',
           headers: {
@@ -165,10 +175,14 @@ async function listFiles() {
     if (!fileList) return;
   
     fileList.innerHTML = ''; // Clear existing list
+    const accessToken = localStorage.getItem('accessToken');
   
     try {
       const response = await fetch(`${API_BASE_URL}/files`, {
         method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+        },
       });
   
       const files = await response.json();
@@ -196,13 +210,18 @@ async function listFiles() {
       console.error('Error listing files:', error);
       fileList.textContent = 'An error occurred while listing files.';
     }
-} 
+}
 
 // Download file function
 async function downloadFile(filename) {
+    const accessToken = localStorage.getItem('accessToken');
+  
     try {
       const response = await fetch(`${API_BASE_URL}/download/${filename}`, {
         method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+        },
       });
   
       const result = await response.json();

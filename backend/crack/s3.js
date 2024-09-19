@@ -57,18 +57,19 @@ const downloadFile = async (folder, fileName) => {
 // provide endpoint to list all files for that user
 // list all files in {user sub} using the s3 sdk
 const listFiles = async (folder) => {
-    // Create a pre-signed URL for getting an object
     try {
         const command = new S3.ListObjectsCommand({
-            'Bucket': bucketName,
-            'Prefix': folder,
-        });
+        Bucket: bucketName,
+        Prefix: folder,
+      });
         const response = await s3Client.send(command);
-        return response.Contents;
+        // Return an empty array if Contents is undefined
+        return response.Contents || [];
     } catch (err) {
-        console.log(err);
+        console.error('Error listing files from S3:', err);
+        throw err; // Re-throw the error to be handled by the caller
     }
-};
+  };
 
 // delete file (file id) returns ()
 // provide endpoint to delete file from s3

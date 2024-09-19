@@ -3,13 +3,14 @@ const { signUpUser } = require('./cognito/signUp');
 const { confirmSignUp } = require('./cognito/confirm');
 const { authenticateUser } = require('./cognito/authenticate');
 const { uploadFile, downloadFile, listFiles } = require('./crack/s3');
+const { authenticateMiddleware } = require('./cognito/jwt_middleware_verify');
 
 const app = express();
 app.use(express.json());
 
 // Manually set CORS headers
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); // Update to restrict origins in production
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
@@ -50,10 +51,11 @@ app.post('/cognito/authenticate', async (req, res) => {
   }
 });
 
-app.post('/upload', async (req, res) => {
+app.post('/upload', authenticateMiddleware, async (req, res) => {
   try {
     const { fileName, contentType } = req.body;
-    const url = await uploadFile('christian', fileName, contentType);
+    const folder = req.user.sub;
+    const url = await uploadFile(folder, fileName, contentType);
     res.json({ url });
   } catch (error) {
     console.error('Error uploading file', error);
@@ -61,27 +63,31 @@ app.post('/upload', async (req, res) => {
   }
 });
 
-app.get('/files', async (req, res) => {
+app.get('/files', authenticateMiddleware, async (req, res) => {
   try {
-      const files = await listFiles('christian');
-      const fileNames = files.map(file => file.Key.replace('christian/', ''));
-      res.json(fileNames);
+    const folder = req.user.sub;
+    const files = await listFiles(folder);
+    const fileNames = files.map(file => file.Key.replace(`${folder}/`, ''));
+    res.json(fileNames);
   } catch (error) {
-      console.error('Error listing files', error);
-      res.status(500).json({ message: 'Failed to list files.' });
+    console.error('Error listing files', error);
+    res.status(500).json({ message: 'Failed to list files.' });
   }
 });
 
-app.get('/download/:filename', async (req, res) => {
+
+app.get('/download/:filename', authenticateMiddleware, async (req, res) => {
   try {
-      const filename = req.params.filename;
-      const url = await downloadFile('christian', filename);
-      res.json({ url });
+    const filename = req.params.filename;
+    const folder = req.user.sub;
+    const url = await downloadFile(folder, filename);
+    res.json({ url });
   } catch (error) {
-      console.error('Error generating download URL', error);
-      res.status(500).json({ message: 'Failed to generate download URL.' });
+    console.error('Error generating download URL', error);
+    res.status(500).json({ message: 'Failed to generate download URL.' });
   }
 });
+
 
 // Status endpoint to check if server is running
 app.get('/status', (req, res) => {

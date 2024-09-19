@@ -7,14 +7,38 @@
 </head>
 <body>
     <h2>File Cracker</h2>
+    <h3>File Upload:</h3>
     <form id="uploadForm">
         <input type="file" id="fileInput" name="file" required>
         <button type="submit">Upload</button>
     </form>
     <div id="uploadMessage"></div>
-
+    <br>
     <h3>Your Files</h3>
+    <p>To download a file, click on the download button to the right of the intended file.</p>
+    <h4>List:</h4>
     <ul id="fileList"></ul>
+
+    <h3>Crack a File</h3>
+    <p>How to crack a file:
+        <ol>
+            <li>Upload a file</li>
+            <li>Select the file you want to crack</li>
+            <li>Select a word list</li>
+            <li>Click "Crack Time! or Become a Cracker!"</li>
+        </ol>
+    </p>
+    <form id="crackForm">   
+        <label for="crackFileSelect">File to crack:</label>
+        <select id="crackFileSelect" name="toCrack" style="width: 200px;">
+        </select>
+        <br><br>
+        <label for="wordListSelect">Word list:</label>
+        <select id="wordListSelect" name="wordList"  style="width: 200px;">
+        </select>
+        <br><br>
+        <button type="submit">Crack Time! or Become a Cracker!</button>
+    </form>
 
     <script src="script.js"></script>
 </body>
