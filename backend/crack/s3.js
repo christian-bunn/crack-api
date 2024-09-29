@@ -27,7 +27,6 @@ let s3Client = new S3.S3Client({ region: "ap-southeast-2" });
       })
     );
     const secret = response.SecretString;
-    console.log(secret);
     const secretObj = JSON.parse(secret);
     const accessKeyId = secretObj.AWS_ACCESS_KEY_ID;
     const secretAccessKey = secretObj.AWS_SECRET_ACCESS_KEY;
