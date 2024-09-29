@@ -249,28 +249,35 @@ async function listFiles() {
 
 // Download file function
 async function downloadFile(filename) {
-    const accessToken = localStorage.getItem('accessToken');
-  
-    try {
+  const accessToken = localStorage.getItem('accessToken');
+
+  try {
       const response = await fetch(`${API_BASE_URL}/download/${filename}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + accessToken,
-        },
+          method: 'GET',
+          headers: {
+              'Authorization': 'Bearer ' + accessToken,
+          },
       });
-  
+
       const result = await response.json();
-  
+
       if (response.ok) {
-        const presignedURL = result.url;
-        // Redirect the user to the presigned URL
-        window.open(presignedURL);
+          const presignedURL = result.url;
+
+          // Create an anchor element and trigger the download
+          const link = document.createElement('a');
+          link.href = presignedURL;
+          link.download = filename; // Set the filename
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
       } else {
-        console.error('Error getting presigned URL:', result.message);
+          console.error('Error getting presigned URL:', result.message);
       }
-    } catch (error) {
+  } catch (error) {
       console.error('Error downloading file:', error);
-    }
+  }
 }
 
 

@@ -1,5 +1,7 @@
 require("dotenv").config();
 const S3 = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const S3Presigner = require("@aws-sdk/s3-request-presigner");
 const bucketName = 'n11092505-assessment-2'
 const s3Client = new S3.S3Client({ region: 'ap-southeast-2' });
@@ -37,42 +39,41 @@ const uploadFile = async (folder, fileName, contentType) => {
 const downloadFile = async (folder, fileName) => {
   const cacheKey = `${folder}/${fileName}`;
   const currentTime = Date.now();
-    // TODO: Implement the cache
-    // check if signed url is in cache or expired already
-    if (cache[cacheKey]) {
-      if (cache[cacheKey].expiry > currentTime) { // if it is in cache, return the signed url
+
+  // Check if signed URL is in cache and hasn't expired
+  if (cache[cacheKey]) {
+      if (cache[cacheKey].expiry > currentTime) {
           console.log('Returning cached presigned URL for:', cacheKey);
           return cache[cacheKey].url;
       } else {
-          // else remove expired URL from cache
+          // Remove expired URL from cache
           delete cache[cacheKey];
       }
-    }
-    // if not, generate a new signed url
-    // store the signed url in cache
-    // return the signed url
-  
+  }
 
-    // Create a pre-signed URL for getting an object
-    try {
-        const command = new S3.GetObjectCommand({
-                Bucket: bucketName,
-                Key: cacheKey,
-            });
-        const presignedURL = await S3Presigner.getSignedUrl(s3Client, command, { expiresIn: 3600 });
-        console.log('Pre-signed URL to get the object:')
-        console.log(presignedURL);
+  // Create a pre-signed URL for getting an object
+  try {
+      const command = new GetObjectCommand({
+          Bucket: bucketName,
+          Key: cacheKey,
+          ResponseContentDisposition: `attachment; filename="${fileName}"`,
+      });
+      const expiresIn = 3600; // 1 hour
+      const presignedURL = await getSignedUrl(s3Client, command, { expiresIn });
+      console.log('Pre-signed URL to get the object:');
+      console.log(presignedURL);
 
-        // Store the URL and its expiry time in cache
-        cache[cacheKey] = {
+      // Store the URL and its expiry time in cache
+      cache[cacheKey] = {
           url: presignedURL,
           expiry: currentTime + expiresIn * 1000, // expiry time in milliseconds
-        };
+      };
 
-        return presignedURL;
-    } catch (err) {
-        console.log(err);
-    }
+      return presignedURL;
+  } catch (err) {
+      console.log(err);
+      throw err; // Re-throw the error so the caller can handle it
+  }
 };
 
 
