@@ -1,30 +1,26 @@
-FROM ubuntu:latest
-RUN apt update && apt install -y hashcat
-WORKDIR /app
-
+FROM node:22
 
 # update the repository sources list
 # and install dependencies
 RUN apt-get update \
     && apt-get install -y curl \
+    && apt install -y hashcat \
     && apt-get -y autoclean
 
-# install node js
-# install node and npm
-RUN source $NVM_DIR/nvm.sh \
-    && nvm install node \
-    && nvm alias default node \
-    && nvm use default
+WORKDIR /backend
+COPY ./package.json .
+COPY ./package-lock.json .
 
-RUN apt install -y curl
 # install dependencies
-RUN npm init -y \
-    npm i @aws-sdk/client-s3 \
-    npm i dotenv \
-    npm install multer \
-    npm install aws-sdk \
-    npm i @aws-sdk/client-dynamodb \
-    npm i @aws-sdk/lib-dynamodb  
+RUN npm ci
+
+COPY ./cognito ./cognito
+COPY ./crack ./crack
+COPY ./server.js ./server.js
+
+ENV AWS_ACCESS_KEY_ID ""
+ENV AWS_SECRET_ACCESS_KEY ""
+ENV AWS_SESSION_TOKEN ""
 
 # run backend
-RUN node server.js
+ENTRYPOINT ["npm", "run", "start"]
