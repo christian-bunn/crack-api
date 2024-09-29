@@ -30,9 +30,11 @@ let s3Client = new S3.S3Client({ region: "ap-southeast-2" });
     const secretObj = JSON.parse(secret);
     const accessKeyId = secretObj.AWS_ACCESS_KEY_ID;
     const secretAccessKey = secretObj.AWS_SECRET_ACCESS_KEY;
+    const sessionToken = secretObj.AWS_SESSION_TOKEN;
+    console.log({ accessKeyId, secretAccessKey });
     s3Client = new S3.S3Client({
       region: "ap-southeast-2",
-      credentials: { accessKeyId, secretAccessKey },
+      credentials: { accessKeyId, secretAccessKey, sessionToken },
     });
   }
 })();
