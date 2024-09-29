@@ -33,6 +33,8 @@ const crackFile = async (folder, fileName, mask, res) => {
     const hashcat = spawn('hashcat', [
         '-a',
         '3',
+        '-w', 
+        '3',
         '-m',
         '1700',
         '-O',
