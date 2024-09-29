@@ -1,4 +1,4 @@
-Assignment 1 - Web Server - Response to Criteria
+Assignment 2 - Web Server - Response to Criteria
 ================================================
 
 Instructions
@@ -13,31 +13,43 @@ Instructions
 Overview
 ------------------------------------------------
 
-- **Name:**
-- **Student number:**
-- **Partner name (if applicable):**
-- **Application name:**
-- **Two line description:** 
-- **EC2 instance name or ID:**
+- **Name:** Christian Bunn
+- **Student number:** n11092505
+- **Partner name (if applicable):** NA
+- **Application name:** File Cracking Service
+- **Two line description:**  In this application, you login or create an account. You then have permission to upload files to the app and download the selected files.
+                             You also have the option to crack the uploaded files using hashcat and the specific mask.
+- **EC2 instance name or ID:** i-04e8ee01ca7ca72e8
 
 Core criteria
 ------------------------------------------------
 
 ### Core - First data persistence service
 
-- **AWS service name:**  [eg. S3]
-- **What data is being stored?:** [eg video files]
-- **Why is this service suited to this data?:** [eg. large files are best suited to blob storage due to size restrictions on other services]
-- **Why is are the other services used not suitable for this data?:**
-- **Bucket/instance/table name:**
+- **AWS service name:**  S3
+- **What data is being stored?:** any text files
+- **Why is this service suited to this data?:** s3 allows for many different types of files, which makes the service more user friendly with the files is can accept. 
+- **Why is are the other services used not suitable for this data?:** TODO
+- **Bucket/instance/table name:** n11092505-assessment-2
 - **Video timestamp:**
 - **Relevant files:**
-    -
+    - /backend/crack/s3.js
 
 ### Core - Second data persistence service
 
-- **AWS service name:**  [eg. DynamoDB]
-- **What data is being stored?:** 
+- **AWS service name:** DynamoDB
+- **What data is being stored?:** file metadata. file name, password, timeCracked, user (that the file belongs to).
+- **Why is this service suited to this data?:** this service works appropriately for this data.
+- **Why is are the other services used not suitable for this data?:** TODO
+- **Bucket/instance/table name:** n11092505-assessment2-file-metadata
+- **Video timestamp:**
+- **Relevant files:**
+    - /backend/cognito/db.js
+
+### Third data service
+
+- **AWS service name:**
+- **What data is being stored?:**
 - **Why is this service suited to this data?:**
 - **Why is are the other services used not suitable for this data?:**
 - **Bucket/instance/table name:**
@@ -45,29 +57,18 @@ Core criteria
 - **Relevant files:**
     -
 
-### Third data service
-
-- **AWS service name:**  [eg. RDS]
-- **What data is being stored?:** [eg video metadata]
-- **Why is this service suited to this data?:** [eg. ]
-- **Why is are the other services used not suitable for this data?:** [eg. Advanced video search requires complex querries which are not available on S3 and inefficient on DynamoDB]
-- **Bucket/instance/table name:**
-- **Video timestamp:**
-- **Relevant files:**
-    -
-
 ### S3 Pre-signed URLs
 
-- **S3 Bucket names:**
+- **S3 Bucket names:** n11092505-assessment-2 (the object names are user specific)
 - **Video timestamp:**
 - **Relevant files:**
-    -
+    - /backend/crack/s3.js
 
 ### In-memory cache
 
-- **ElastiCache instance name:**
-- **What data is being cached?:** [eg. Thumbnails from YouTube videos obatined from external API]
-- **Why is this data likely to be accessed frequently?:** [ eg. Thumbnails from popular YouTube videos are likely to be shown to multiple users ]
+- **ElastiCache instance name:** n11092505-cache
+- **What data is being cached?:** s3 pre-signed urls TODO: might have to cache something else.
+- **Why is this data likely to be accessed frequently?:** users might want to download files multiple times.
 - **Video timestamp:**
 - **Relevant files:**
     -
@@ -82,26 +83,30 @@ Core criteria
 
 ### Graceful handling of persistent connections
 
-- **Type of persistent connection and use:** [eg. server-side-events for progress reporting]
-- **Method for handling lost connections:** [eg. client responds to lost connection by reconnecting and indicating loss of connection to user until connection is re-established ]
+- **Type of persistent connection and use:**
+- **Method for handling lost connections:**
 - **Relevant files:**
     -
 
 
 ### Core - Authentication with Cognito
 
-- **User pool name:**
-- **How are authentication tokens handled by the client?:** [eg. Response to login request sets a cookie containing the token.]
+- **User pool name:** n11092505-cognito-a2
+- **How are authentication tokens handled by the client?:** TODO
 - **Video timestamp:**
 - **Relevant files:**
-    -
+    - /backend/cognito/authenticate.js
+    - /backend/cognito/confirm.js
+    - /backend/cognito/signUp.js
+    - /backend/cognito/jwt_middleware_verify.js
 
 ### Cognito multi-factor authentication
 
-- **What factors are used for authentication:** [eg. password, SMS code]
+- **What factors are used for authentication:** password, email code
 - **Video timestamp:**
 - **Relevant files:**
-    -
+    - /backend/cognito/signUp.js
+    - /backend/cognito/confirm.js
 
 ### Cognito federated identities
 
@@ -112,14 +117,14 @@ Core criteria
 
 ### Cognito groups
 
-- **How are groups used to set permissions?:** [eg. 'admin' users can delete and ban other users]
+- **How are groups used to set permissions?:** TODO: this could be a potential implementation. to create cognito group. if apart of the admin group provide restart exit code -1 button.
 - **Video timestamp:**
 - **Relevant files:**
     -
 
 ### Core - DNS with Route53
 
-- **Subdomain**:  [eg. myawesomeapp.cab432.com]
+- **Subdomain** cracker.cab432.com
 - **Video timestamp:**
 
 
@@ -140,10 +145,12 @@ Core criteria
 
 ### Secrets manager
 
-- **Secrets names:** [eg. n1234567-youtube-api-key]
+- **Secrets names:** n11092505-assessment2
 - **Video timestamp:**
-- **Relevant files:**
-    -
+- **Relevant files:** TODO: this might have to be alterd to contain something other then the env access keys
+    - /backend/Dockerfile
+    - /backend/crack/s3/.js
+
 
 ### Infrastructure as code
 
