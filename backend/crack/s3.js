@@ -76,7 +76,7 @@ const memcachedSet = promisify(memcached.set).bind(memcached);
 const downloadFile = async (folder, fileName) => {
   const cacheKey = `${folder}/${fileName}`;
 
-  // this checks if the signed url is in and and that is hasn't expired
+  // this checks if the signed url is in cache and that it hasn't expired
   try {
     const dataStr = await memcachedGet(cacheKey);
     if (dataStr) {
