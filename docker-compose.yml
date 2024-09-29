@@ -1,0 +1,7 @@
+services:
+  frontend:
+    restart: unless-stopped
+    build: ./frontend
+  backend:
+    restart: unless-stopped
+    build: ./backend
