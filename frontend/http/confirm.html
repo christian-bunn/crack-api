@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirm Account</title>
+    <title>Confirm Account and Setup MFA</title>
 </head>
 <body>
     <h2>Confirm Account</h2>
@@ -13,6 +13,22 @@
         <button type="submit">Confirm</button>
     </form>
     <div id="confirmationMessage"></div>
+
+    <!-- additional MFA setup -->
+    <div id="mfaSetup" style="display: none;">
+        <h2>Set Up MFA</h2>
+        <p>Scan this QR code with your authenticator app:</p>
+        <img id="qrCodeImage" src="" alt="QR Code">
+        <p>Alternatively, enter this secret key into your authenticator app:</p>
+        <p id="secretKey"></p>
+        <form id="verifyMfaForm">
+            <label for="totpCode">Enter code from authenticator app:</label>
+            <input type="text" id="totpCode" name="totpCode" required>
+            <button type="submit">Verify</button>
+        </form>
+        <div id="mfaMessage"></div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

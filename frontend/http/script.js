@@ -3,36 +3,50 @@ const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:3
 // Form submission for login
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
-    loginForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
+  loginForm.addEventListener('submit', async function(event) {
+    event.preventDefault();
 
-        const username = document.getElementById('loginUsername').value;
-        const password = document.getElementById('loginPassword').value;
-        const loginMessageDiv = document.getElementById('loginMessage');
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+    const loginMessageDiv = document.getElementById('loginMessage');
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/cognito/authenticate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            });
+    try {
+      const response = await fetch(`${API_BASE_URL}/cognito/authenticate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      });
 
-            const result = await response.json();
-            if (response.ok) {
-                loginMessageDiv.textContent = "Login successful!";
-                localStorage.setItem('accessToken', result.accessToken);
-                // Redirect to cracker.html
-                window.location.href = 'cracker.html';
-            } else {
-                loginMessageDiv.textContent = `Login failed: ${result.message}`;
-            }
-        } catch (error) {
-            console.error('Error during login:', error);
-            loginMessageDiv.textContent = "An error occurred during login.";
+      const result = await response.json();
+      if (response.ok) {
+        if (result.status === 'MFA_REQUIRED') {
+            // Prompt user for MFA code, passing password
+            promptMfaCode(username, password, result.session);
+        } else if (result.status === 'MFA_SETUP_REQUIRED') {
+            // Redirect to MFA setup page
+            localStorage.setItem('username', username);
+            localStorage.setItem('session', result.session);
+            window.location.href = 'mfa_setup.html';
+        } else if (result.status === 'SUCCESS') {
+            // Authentication successful
+            loginMessageDiv.textContent = "Login successful!";
+            localStorage.setItem('accessToken', result.accessToken);
+            localStorage.setItem('idToken', result.idToken);
+            // Redirect to cracker.html
+            window.location.href = 'cracker.html';
+        } else {
+            loginMessageDiv.textContent = `Login failed: ${result.message}`;
         }
-    });
+    } else {
+        loginMessageDiv.textContent = `Login failed: ${result.error}`;
+    }
+    } catch (error) {
+      console.error('Error during login:', error);
+      loginMessageDiv.textContent = "An error occurred during login.";
+    }
+  });
 }
 
 // Form submission for signup
@@ -93,10 +107,9 @@ if (confirmForm) {
 
             const result = await response.json();
             if (response.ok) {
-                messageDiv.textContent = "Confirmation successful! Redirecting to login page...";
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 2000);
+                messageDiv.textContent = "Confirmation successful!";
+                // when confirmation is successful proceed to MFA setup
+                initiateMfaSetup(username);
             } else {
                 messageDiv.textContent = `Confirmation failed: ${result.error}`;
             }
@@ -288,6 +301,11 @@ document.addEventListener('DOMContentLoaded', () => {
       listFiles();
   }
 
+  const mfaSetupDiv = document.getElementById('mfaSetup');
+  if (mfaSetupDiv) {
+    initiateMfaSetup();
+  }
+
   // code to check if the user is an admin
   const accessToken = localStorage.getItem('accessToken');
   if (accessToken) {
@@ -375,6 +393,175 @@ if (crackForm) {
     } catch (error) {
       console.error('Error starting crack:', error);
       console.warn('An error occurred while starting the crack.');
+    }
+  });
+}
+
+// function to display the MFA setup form
+async function initiateMfaSetup() {
+  const username = localStorage.getItem('username');
+  const session = localStorage.getItem('session');
+
+  try {
+    // Associate the software token
+    const response = await fetch(`${API_BASE_URL}/cognito/associateMFA`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ session })
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem('session', result.Session);
+      displayMfaSetup(result);
+    } else {
+      console.error('Error during MFA association:', result.error);
+    }
+  } catch (error) {
+    console.error('Error during MFA association:', error);
+  }
+}
+
+// function to display the MFA setup form
+function displayMfaSetup(mfaData) {
+  const mfaSetupDiv = document.getElementById('mfaSetup');
+  const qrCodeContainer = document.getElementById('qrCodeContainer');
+  const secretKeyP = document.getElementById('secretKey');
+
+  // Generate QR code data
+  const secretCode = mfaData.SecretCode;
+  const username = localStorage.getItem('username');
+  const qrCodeData = `otpauth://totp/FileCracker:${username}?secret=${secretCode}&issuer=FileCracker`;
+
+  // Clear any existing QR code
+  qrCodeContainer.innerHTML = '';
+
+  // Generate QR code using QRCode.js
+  new QRCode(qrCodeContainer, {
+    text: qrCodeData,
+    width: 200,
+    height: 200,
+  });
+
+  // Display Secret Key
+  secretKeyP.textContent = secretCode;
+
+  // Show the MFA setup section
+  mfaSetupDiv.style.display = 'block';
+}
+
+// Event listener for MFA setup page
+document.addEventListener('DOMContentLoaded', () => {
+  const mfaSetupDiv = document.getElementById('mfaSetup');
+  if (mfaSetupDiv) {
+    initiateMfaSetup();
+  }
+});
+
+// form submission for MFA verification
+// Form submission for MFA verification in mfa_setup.html
+const verifyMfaForm = document.getElementById('verifyMfaForm');
+if (verifyMfaForm) {
+  verifyMfaForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      const totpCode = document.getElementById('totpCode').value;
+      const password = document.getElementById('password').value;
+      const session = localStorage.getItem('session'); // Ensure 'session' is stored during MFA setup
+      const username = localStorage.getItem('username');
+      const messageDiv = document.getElementById('mfaMessage');
+
+      try {
+          const response = await fetch(`${API_BASE_URL}/cognito/authenticate`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ username, password, totpCode, session })
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+              messageDiv.textContent = "MFA verification successful! Redirecting to login page...";
+              // Clear sensitive data
+              localStorage.removeItem('session');
+              localStorage.removeItem('username');
+              // Redirect to login page after a short delay
+              setTimeout(() => {
+                  window.location.href = 'index.html';
+              }, 2000);
+          } else {
+              messageDiv.textContent = `MFA verification failed: ${result.error}`;
+          }
+      } catch (error) {
+          console.error('Error during MFA verification:', error);
+          messageDiv.textContent = "An error occurred during MFA verification.";
+      }
+  });
+}
+
+
+// function to prompt the user for MFA code
+function promptMfaCode(username, password, session) {
+  const loginForm = document.getElementById('loginForm');
+  const loginMessageDiv = document.getElementById('loginMessage');
+
+  // Hide the login form
+  loginForm.style.display = 'none';
+
+  // Create MFA code input form
+  const mfaForm = document.createElement('form');
+  mfaForm.id = 'mfaForm';
+
+  const label = document.createElement('label');
+  label.setAttribute('for', 'mfaCode');
+  label.textContent = 'Enter MFA Code:';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'mfaCode';
+  input.name = 'mfaCode';
+  input.required = true;
+
+  const button = document.createElement('button');
+  button.type = 'submit';
+  button.textContent = 'Verify';
+
+  mfaForm.appendChild(label);
+  mfaForm.appendChild(input);
+  mfaForm.appendChild(button);
+
+  document.body.appendChild(mfaForm);
+
+  mfaForm.addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const mfaCode = input.value;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/cognito/authenticate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password, mfaCode, session })
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        loginMessageDiv.textContent = "Login successful!";
+        localStorage.setItem('accessToken', result.accessToken);
+        localStorage.setItem('idToken', result.idToken);
+        // Redirect to cracker.html
+        window.location.href = 'cracker.html';
+      } else {
+        loginMessageDiv.textContent = `MFA verification failed: ${result.error}`;
+      }
+    } catch (error) {
+      console.error('Error during MFA verification:', error);
+      loginMessageDiv.textContent = "An error occurred during MFA verification.";
     }
   });
 }

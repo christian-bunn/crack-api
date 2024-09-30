@@ -5,6 +5,7 @@ const { authenticateUser } = require('./cognito/authenticate');
 const { uploadFile, downloadFile, listFiles } = require('./crack/s3');
 const { authenticateMiddleware } = require('./cognito/jwt_middleware_verify');
 const { crackFile } = require('./crack/crack');
+const { associateSoftwareToken, verifySoftwareToken, setUserMFAPreference } = require('./cognito/mfa');
 
 const app = express();
 app.use(express.json());
@@ -43,11 +44,12 @@ app.post('/cognito/confirm', async (req, res) => {
 
 // Authentication API route
 app.post('/cognito/authenticate', async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, mfaCode, session } = req.body;
   try {
-    const response = await authenticateUser(username, password);
+    const response = await authenticateUser(username, password, mfaCode, session);
     res.status(200).json(response);
   } catch (error) {
+    console.error('Error during authentication:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -114,6 +116,42 @@ app.post('/exit', authenticateMiddleware, adminMiddleware, (req, res) => {
   res.send('Server is exiting.');
   console.log('Server is exiting as per admin request.');
   process.exit(0); // Exit the server
+});
+
+// endpoint to setup MFA
+app.post('/cognito/setupMFA', authenticateMiddleware, async (req, res) => {
+  const { username } = req.body;
+  try {
+    const response = await associateSoftwareToken(req.user.accessToken);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// endpoint to verify MFA
+app.post('/cognito/verifyMFA', async (req, res) => {
+  const { totpCode, session, username } = req.body;
+  try {
+    const response = await verifySoftwareToken(session, totpCode, username);
+    res.status(200).json(response);
+  } catch (error) {
+    console.error('Error during MFA verification:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+// endpoint to associate MFA
+app.post('/cognito/associateMFA', async (req, res) => {
+  const { session } = req.body;
+  try {
+    const response = await associateSoftwareToken(session);
+    res.status(200).json(response);
+  } catch (error) {
+    console.error('Error during MFA association:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Status endpoint to check if server is running

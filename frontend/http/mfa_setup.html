@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MFA Setup</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+  <h2>Set Up MFA</h2>
+  <div id="mfaSetup">
+    <p>Scan this QR code with your authenticator app:</p>
+    <div id="qrCodeContainer"></div>
+    <p>Alternatively, enter this secret key into your authenticator app:</p>
+    <p id="secretKey"></p>
+    <form id="verifyMfaForm">
+      <label for="totpCode">Enter code from authenticator app:</label>
+      <input type="text" id="totpCode" name="totpCode" required>
+      <br><br>
+      <button type="submit">Verify</button>
+    </form>
+    <div id="mfaMessage"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
