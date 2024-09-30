@@ -11,35 +11,7 @@ const S3Presigner = require("@aws-sdk/s3-request-presigner");
 const bucketName = "n11092505-assessment-2";
 const Memcached = require('memcached');
 const memcached = new Memcached('n11092505-cache.km2jzi.0001.apse2.cache.amazonaws.com:11211');
-let s3Client = new S3.S3Client({ region: "ap-southeast-2" });
-
-(async () => {
-  if (process.env.NODE_ENV !== "development") {
-    const SecretsManager = require("@aws-sdk/client-secrets-manager");
-    const secret_name = "n11092505-assessment2";
-    const client = new SecretsManager.SecretsManagerClient({
-      region: "ap-southeast-2",
-    });
-    // get credentials from aws secrets manager
-    // update the credentials above with the secret manager values
-    response = await client.send(
-      new SecretsManager.GetSecretValueCommand({
-        SecretId: secret_name,
-      })
-    );
-    const secret = response.SecretString;
-    const secretObj = JSON.parse(secret);
-    const accessKeyId = secretObj.AWS_ACCESS_KEY_ID;
-    const secretAccessKey = secretObj.AWS_SECRET_ACCESS_KEY;
-    const sessionToken = secretObj.AWS_SESSION_TOKEN;
-    console.log({ accessKeyId, secretAccessKey });
-    s3Client = new S3.S3Client({
-      region: "ap-southeast-2",
-      credentials: { accessKeyId, secretAccessKey, sessionToken },
-    });
-  }
-})();
-
+const s3Client = new S3.S3Client({ region: "ap-southeast-2" });
 
 // note: store the files in s3 based on username ("sub": "d9ae4408-f031-7010-d902-7422e61d7ad2") - sub means subject and is the id of the user
 // note: make sure public access to the s3 is disabled (block all public access)

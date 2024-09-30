@@ -1,4 +1,4 @@
-const API_BASE_URL = `${window.location.origin}:3000`;
+const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:3000`;
 
 // Form submission for login
 const loginForm = document.getElementById('loginForm');
@@ -296,12 +296,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (groups.includes('admin')) {
           // User is admin, display the exit button
           const exitButton = document.createElement('button');
+          const exitButtonTitle = document.createElement('h2');
+          exitButtonTitle.textContent = 'Admin Controls:';
           exitButton.textContent = 'Exit Server';
           exitButton.addEventListener('click', () => {
               exitServer();
           });
           document.body.appendChild(exitButton);
       }
+  }
+  else {
+      console.log('User is not an admin.');
   }
 });
 
