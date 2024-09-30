@@ -100,6 +100,22 @@ app.post('/crack/start', authenticateMiddleware, async (req, res) => {
   }
 });
 
+// middleware function to check if user is an admin
+function adminMiddleware(req, res, next) {
+  if (req.user && req.user.groups && req.user.groups.includes('admin')) {
+    next();
+  } else {
+    res.status(403).json({ message: 'Access denied. Admins only.' });
+  }
+}
+
+// // exit endpoint to exit the server
+app.post('/exit', authenticateMiddleware, adminMiddleware, (req, res) => {
+  res.send('Server is exiting.');
+  console.log('Server is exiting as per admin request.');
+  process.exit(0); // Exit the server
+});
+
 // Status endpoint to check if server is running
 app.get('/status', (req, res) => {
   res.json({ status: "API Running" });

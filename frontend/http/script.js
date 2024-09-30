@@ -282,12 +282,51 @@ async function downloadFile(filename) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if we're on cracker.html by checking for a unique element
-    const fileList = document.getElementById('fileList');
-    if (fileList) {
-        listFiles();
-    }
+  // check if we're on cracker.html by checking for a unique element
+  const fileList = document.getElementById('fileList');
+  if (fileList) {
+      listFiles();
+  }
+
+  // code to check if the user is an admin
+  const accessToken = localStorage.getItem('accessToken');
+  if (accessToken) {
+      const decodedToken = jwt_decode(accessToken);
+      const groups = decodedToken['cognito:groups'] || [];
+      if (groups.includes('admin')) {
+          // User is admin, display the exit button
+          const exitButton = document.createElement('button');
+          exitButton.textContent = 'Exit Server';
+          exitButton.addEventListener('click', () => {
+              exitServer();
+          });
+          document.body.appendChild(exitButton);
+      }
+  }
 });
+
+
+// function to call the /exit endpoint
+function exitServer() {
+  const accessToken = localStorage.getItem('accessToken');
+  fetch(`${API_BASE_URL}/exit`, {
+      method: 'POST',
+      headers: {
+          'Authorization': 'Bearer ' + accessToken,
+      },
+  })
+  .then((response) => {
+      if (response.ok) {
+          alert('Server is exiting.');
+      } else {
+          alert('Failed to exit server.');
+      }
+  })
+  .catch((error) => {
+      console.error('Error exiting server:', error);
+      alert('An error occurred while exiting the server.');
+  });
+}
 
 const responseContainer = document.getElementById('crackOutput');
 const crackForm = document.getElementById('crackForm');

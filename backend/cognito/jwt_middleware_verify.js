@@ -21,6 +21,7 @@ const authenticateMiddleware = async (req, res, next) => {
 
     req.user = {
       sub: payload.sub,
+      groups: payload['cognito:groups'] || [],
     };
     next();
   } catch (err) {
