@@ -108,8 +108,10 @@ if (confirmForm) {
             const result = await response.json();
             if (response.ok) {
                 messageDiv.textContent = "Confirmation successful!";
-                // when confirmation is successful proceed to MFA setup
-                initiateMfaSetup(username);
+                // when confirmation is successful redirect to login
+                setTimeout(() => {
+                  window.location.href = 'index.html';
+                }, 1000);
             } else {
                 messageDiv.textContent = `Confirmation failed: ${result.error}`;
             }
