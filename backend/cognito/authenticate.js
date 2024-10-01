@@ -38,6 +38,8 @@ async function authenticateUser(username, password, mfaCode, session) {
       response = await client.send(command);
     }
 
+    console.log(JSON.stringify(response));
+
     // check if authentication was successful
     if (response.AuthenticationResult) {
       // authentication successful

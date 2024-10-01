@@ -15,11 +15,14 @@
     <form id="verifyMfaForm">
       <label for="totpCode">Enter code from authenticator app:</label>
       <input type="text" id="totpCode" name="totpCode" required>
+      <label for="passowrd">Enter password again:</label>
+      <input type="password" id="password" name="password" required>
       <br><br>
       <button type="submit">Verify</button>
     </form>
     <div id="mfaMessage"></div>
   </div>
   <script src="script.js"></script>
+  <script>initiateMfaSetup().catch(e => console.error(JSON.stringify(e)))</script>
 </body>
 </html>

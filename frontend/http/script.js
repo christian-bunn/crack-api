@@ -73,6 +73,7 @@ if (signupForm) {
             if (response.ok) {
                 messageDiv.textContent = "Signup successful! Redirecting to confirmation page...";
                 localStorage.setItem('username', username);
+                console.log({ result });
                 setTimeout(() => {
                     window.location.href = 'confirm.html';
                 }, 2000);
@@ -108,8 +109,7 @@ if (confirmForm) {
             const result = await response.json();
             if (response.ok) {
                 messageDiv.textContent = "Confirmation successful!";
-                // when confirmation is successful proceed to MFA setup
-                initiateMfaSetup(username);
+                window.location.href = 'index.html';
             } else {
                 messageDiv.textContent = `Confirmation failed: ${result.error}`;
             }
@@ -300,12 +300,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (fileList) {
       listFiles();
   }
-
-  const mfaSetupDiv = document.getElementById('mfaSetup');
-  if (mfaSetupDiv) {
-    initiateMfaSetup();
-  }
-
   // code to check if the user is an admin
   const accessToken = localStorage.getItem('accessToken');
   if (accessToken) {
@@ -453,14 +447,6 @@ function displayMfaSetup(mfaData) {
   mfaSetupDiv.style.display = 'block';
 }
 
-// Event listener for MFA setup page
-document.addEventListener('DOMContentLoaded', () => {
-  const mfaSetupDiv = document.getElementById('mfaSetup');
-  if (mfaSetupDiv) {
-    initiateMfaSetup();
-  }
-});
-
 // form submission for MFA verification
 // Form submission for MFA verification in mfa_setup.html
 const verifyMfaForm = document.getElementById('verifyMfaForm');
@@ -489,9 +475,12 @@ if (verifyMfaForm) {
               // Clear sensitive data
               localStorage.removeItem('session');
               localStorage.removeItem('username');
+              localStorage.setItem('accessToken', result.accessToken);
+              localStorage.setItem('idToken', result.idToken);
+              console.log({ result });
               // Redirect to login page after a short delay
               setTimeout(() => {
-                  window.location.href = 'index.html';
+                  window.location.href = 'cracker.html';
               }, 2000);
           } else {
               messageDiv.textContent = `MFA verification failed: ${result.error}`;
