@@ -375,11 +375,11 @@ if (crackForm) {
           const { value, done: streamDone } = await reader.read();
           done = streamDone;
           const chunk = decoder.decode(value, { stream: !done });
-          responseContainer.innerHTML += chunk;  // Append the chunk to the div
+          responseContainer.innerHTML += chunk;
       }
 
       if (response.ok) {
-        // Display the cracking result to the user
+        // this displays the cracking result to the user (completed or failed)
         console.warn(`Cracking completed:\n${result.result}`);
       } else {
         console.warn(`Cracking failed: ${result.message}`);
@@ -397,7 +397,7 @@ async function initiateMfaSetup() {
   const session = localStorage.getItem('session');
 
   try {
-    // Associate the software token
+    // call the /cognito/associateMFA endpoint
     const response = await fetch(`${API_BASE_URL}/cognito/associateMFA`, {
       method: 'POST',
       headers: {
@@ -425,30 +425,29 @@ function displayMfaSetup(mfaData) {
   const qrCodeContainer = document.getElementById('qrCodeContainer');
   const secretKeyP = document.getElementById('secretKey');
 
-  // Generate QR code data
+  // generate QR code data
   const secretCode = mfaData.SecretCode;
   const username = localStorage.getItem('username');
   const qrCodeData = `otpauth://totp/FileCracker:${username}?secret=${secretCode}&issuer=FileCracker`;
 
-  // Clear any existing QR code
+  // clear any existing QR code
   qrCodeContainer.innerHTML = '';
 
-  // Generate QR code using QRCode.js
+  // generate QR code using QRCode.js
   new QRCode(qrCodeContainer, {
     text: qrCodeData,
     width: 200,
     height: 200,
   });
 
-  // Display Secret Key
+  // display the Secret Key
   secretKeyP.textContent = secretCode;
 
-  // Show the MFA setup section
+  // show the MFA setup section
   mfaSetupDiv.style.display = 'block';
 }
 
-// form submission for MFA verification
-// Form submission for MFA verification in mfa_setup.html
+// form submission for MFA verification in mfa_setup.html
 const verifyMfaForm = document.getElementById('verifyMfaForm');
 if (verifyMfaForm) {
   verifyMfaForm.addEventListener('submit', async function(event) {
@@ -472,13 +471,13 @@ if (verifyMfaForm) {
           const result = await response.json();
           if (response.ok) {
               messageDiv.textContent = "MFA verification successful! Redirecting to File Cracking Service page...";
-              // Clear sensitive data
+              // clear sensitive data
               localStorage.removeItem('session');
               localStorage.removeItem('username');
               localStorage.setItem('accessToken', result.accessToken);
               localStorage.setItem('idToken', result.idToken);
               console.log({ result });
-              // Redirect to login page after a short delay
+              // redirect to login page with a wait
               setTimeout(() => {
                   window.location.href = 'cracker.html';
               }, 2000);
@@ -498,10 +497,10 @@ function promptMfaCode(username, password, session) {
   const loginForm = document.getElementById('loginForm');
   const loginMessageDiv = document.getElementById('loginMessage');
 
-  // Hide the login form
+  // hide the login form
   loginForm.style.display = 'none';
 
-  // Create MFA code input form
+  // create MFA code input form
   const mfaForm = document.createElement('form');
   mfaForm.id = 'mfaForm';
 

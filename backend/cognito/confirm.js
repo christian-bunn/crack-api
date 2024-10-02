@@ -1,6 +1,6 @@
 const Cognito = require("@aws-sdk/client-cognito-identity-provider");
 
-const clientId = "7outo577k5qf43qegboraga6kr"; // match signUp.js
+const clientId = "7outo577k5qf43qegboraga6kr";
 
 async function confirmSignUp(username, confirmationCode) {
   const client = new Cognito.CognitoIdentityProviderClient({ region: 'ap-southeast-2' });

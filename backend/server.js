@@ -11,14 +11,14 @@ const { associateSoftwareToken, verifySoftwareToken, setUserMFAPreference } = re
 const app = express();
 app.use(express.json());
 
-// Use CORS middleware
+// CORS middleware
 app.use(cors({
   origin: ['http://cracker.cab432.com', 'http://127.0.0.1:8080'], // Replace with your frontend application's origin
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Manually set CORS headers
+// manually setting the headers for consistent cors behaviour
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 
 app.use(express.static('frontend/http'));
 
-// Sign-up API route
+// sign-up API route
 app.post('/cognito/signUp', async (req, res) => {
   const { username, password, email } = req.body;
   try {
@@ -39,7 +39,7 @@ app.post('/cognito/signUp', async (req, res) => {
   }
 });
 
-// Confirmation API route
+// confirmation API route
 app.post('/cognito/confirm', async (req, res) => {
   const { username, confirmationCode } = req.body;
   try {
@@ -50,7 +50,7 @@ app.post('/cognito/confirm', async (req, res) => {
   }
 });
 
-// Authentication API route
+// authentication API route
 app.post('/cognito/authenticate', async (req, res) => {
   const { username, password, mfaCode, session } = req.body;
   try {
@@ -62,6 +62,7 @@ app.post('/cognito/authenticate', async (req, res) => {
   }
 });
 
+// upload API route
 app.post('/upload', authenticateMiddleware, async (req, res) => {
   try {
     const { fileName, contentType } = req.body;
@@ -74,6 +75,7 @@ app.post('/upload', authenticateMiddleware, async (req, res) => {
   }
 });
 
+// list files API route
 app.get('/files', authenticateMiddleware, async (req, res) => {
   try {
     const folder = req.user.sub;
@@ -86,7 +88,7 @@ app.get('/files', authenticateMiddleware, async (req, res) => {
   }
 });
 
-
+// download API route
 app.get('/download/:filename', authenticateMiddleware, async (req, res) => {
   try {
     const filename = req.params.filename;
@@ -99,6 +101,7 @@ app.get('/download/:filename', authenticateMiddleware, async (req, res) => {
   }
 });
 
+// crack API route
 app.post('/crack/start', authenticateMiddleware, async (req, res) => {
   try {
     const folder = req.user.sub;

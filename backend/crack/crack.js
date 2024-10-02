@@ -3,7 +3,7 @@ const S3 = require("@aws-sdk/client-s3");
 const fs = require('fs');
 const { putItemInDynamoDB } = require('./db');
 
-// Creating a client for sending commands to S3
+// defining a client for sending commands to S3
 const s3Client = new S3.S3Client({ region: 'ap-southeast-2' });
 const bucketName = 'n11092505-assessment-2';
 // note: uses hashcat to crack the password for a given file

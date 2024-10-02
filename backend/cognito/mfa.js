@@ -29,7 +29,7 @@ async function verifySoftwareToken(session, totpCode, username) {
 
     const response = await client.send(command);
     if (response.Status === 'SUCCESS') {
-      // Respond to the next challenge to complete authentication
+      // respond to the next challenge to complete authentication
       const respondCommand = new Cognito.RespondToAuthChallengeCommand({
         ChallengeName: 'MFA_SETUP',
         Session: response.Session,

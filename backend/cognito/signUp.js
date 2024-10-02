@@ -1,6 +1,6 @@
 const Cognito = require("@aws-sdk/client-cognito-identity-provider");
 
-const clientId = "7outo577k5qf43qegboraga6kr"; // Obtain from the AWS console
+const clientId = "7outo577k5qf43qegboraga6kr";
 
 async function signUpUser(username, password, email) {
   const client = new Cognito.CognitoIdentityProviderClient({ region: 'ap-southeast-2' });

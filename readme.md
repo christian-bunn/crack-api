@@ -1,25 +1,30 @@
-hashcat -m 22000 -a 0 hashcat.hccapx rockyou.txt
+##ReadMe
 
-hashcat -m 22000 --status --status-timer 10 --outfile cracked.lol -a 3 hashcat.hccapx hashc?l?l!
 
+###To run project from within instance:
+Start Instance on aws
+cd crack-api
+./setup.sh
+docker compose up
+
+
+###Files to upload for cracking:
+link to google drive containing files: https://drive.google.com/drive/folders/1beR_-7FoLD18yqg4GhuSepIyQBePq3Z4?usp=sharing
+To achieve a crack time of greater then 5 mins do a mask of 10 *decimals* (decimals only) to any file. This will likely not crack the file but will give a cpu intense period (90%+) longer then 5 mins.
+
+
+###Additional:
+
+####Method to create password protected files:
 echo -n "mypassword" | sha512sum | cut -f1 -d" " > secret.hash
 hashcat -a 3 -m 1700 --status --status-timer 10 --outfile outfile secret.hash ?l?l?l?l?l?l?l?l?l?l
-
-http-server -c1
-
-curl --upload-file '/home/c/Projects/crack-api/readme.md' ''
-
-curl -v -X PUT -T /home/c/Projects/crack-api/readme.md ""
-
 x=5; y=5; for i in $(seq 1 $x); do hex_string=$(openssl rand -hex $((y/2))); echo -n "$hex_string" | sha512sum | cut -f1 -d" " > "secret-$hex_string.hash"; done
 
 
-To run project:
+####Run frontend individually:
+cd into frontend directory 
+http-server -c1
 
-Start Instance on aws
-
-cd crack-api
-
-./setup.sh
-
-docker compose up
+####Run backend individually:
+cd into backend directory
+node server.js
