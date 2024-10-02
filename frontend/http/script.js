@@ -471,7 +471,7 @@ if (verifyMfaForm) {
 
           const result = await response.json();
           if (response.ok) {
-              messageDiv.textContent = "MFA verification successful! Redirecting to login page...";
+              messageDiv.textContent = "MFA verification successful! Redirecting to File Cracking Service page...";
               // Clear sensitive data
               localStorage.removeItem('session');
               localStorage.removeItem('username');
@@ -480,7 +480,7 @@ if (verifyMfaForm) {
               console.log({ result });
               // Redirect to login page after a short delay
               setTimeout(() => {
-                  // window.location.href = 'cracker.html';
+                  window.location.href = 'cracker.html';
               }, 2000);
           } else {
               messageDiv.textContent = `MFA verification failed: ${result.error}`;
