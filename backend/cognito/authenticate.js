@@ -7,23 +7,29 @@ async function authenticateUser(username, password, mfaCode, session) {
   const client = new Cognito.CognitoIdentityProviderClient({
     region: "ap-southeast-2",
   });
-
+  console.log({
+    username,
+    password,
+    mfaCode,
+    session,
+  })
   try {
     let response;
 
     if (mfaCode && session) {
+      console.log("Responding to MFA challenge");
       const respondCommand = new Cognito.RespondToAuthChallengeCommand({
         ClientId: clientId,
         ChallengeName: 'SOFTWARE_TOKEN_MFA',
         Session: session,
         ChallengeResponses: {
           USERNAME: username,
-          PASSWORD: password,
           SOFTWARE_TOKEN_MFA_CODE: mfaCode,
         },
       });
       response = await client.send(respondCommand);
     } else {
+      console.log("Starting authentication");
       // start of authentication
       let params = {
         AuthFlow: Cognito.AuthFlowType.USER_PASSWORD_AUTH,

@@ -36,10 +36,16 @@ async function verifySoftwareToken(session, totpCode, username) {
         ClientId: '7outo577k5qf43qegboraga6kr',
         ChallengeResponses: {
           USERNAME: username,
+          ANSWER: 'SUCCESS', // had to include a success answer which I wans't doing
         },
       });
 
       const finalResponse = await client.send(respondCommand);
+
+      // setting the user's MFA preferences 
+      const accessToken = finalResponse.AuthenticationResult.AccessToken;
+      await setUserMFAPreference(accessToken);
+
       return finalResponse;
     } else {
       throw new Error('MFA verification failed.');
@@ -61,6 +67,7 @@ async function setUserMFAPreference(accessToken) {
     });
 
     const response = await client.send(command);
+    console.log("MFA preferences set:", response);
     return response;
   } catch (error) {
     console.error("Error during setUserMFAPreference:", error.message);

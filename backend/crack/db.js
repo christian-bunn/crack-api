@@ -26,19 +26,21 @@ const putItemInDynamoDB = async (sub, fileName, data) => {
 
 // function for making a query to dynamodb
 const queryDynamoDB = async (sub, fileName) => {
-    command = new DynamoDBLib.GetCommand({
-        TableName: tableName,
-        Key: {
-            user: sub,
-            file: fileName
-        },
-      });
-      try {
-        const response = await docClient.send(command);
-        console.log("Get command response:", response);
-      } catch (err) {
-        console.log(err);
-      }
+  const command = new DynamoDBLib.GetCommand({
+    TableName: tableName,
+    Key: {
+      user: sub,
+      file: fileName,
+    },
+  });
+  try {
+    const response = await docClient.send(command);
+    console.log("Get command response:", response);
+    return response.Item;
+  } catch (err) {
+    console.log(err);
+    throw err; 
+  }
 };
 
 module.exports = {

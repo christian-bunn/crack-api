@@ -21,6 +21,8 @@ const authenticateMiddleware = async (req, res, next) => {
 
     req.user = {
       sub: payload.sub,
+      username: payload['cognito:username'],
+      email: payload.email,
       groups: payload['cognito:groups'] || [],
     };
     next();
