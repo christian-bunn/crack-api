@@ -29,22 +29,26 @@ Core criteria
 - **AWS service name:**  S3
 - **What data is being stored?:** any text files
 - **Why is this service suited to this data?:** s3 allows for many different types of files, which makes the service more user friendly with the files is can accept. 
-- **Why is are the other services used not suitable for this data?:** TODO
+- **Why is are the other services used not suitable for this data?:** AWS services like DynamoDB, are less suitable for storing unstructured data like text files due to their focus on structured data handling and higher management requirements.
 - **Bucket/instance/table name:** n11092505-assessment-2
 - **Video timestamp:**
 - **Relevant files:**
     - /backend/crack/s3.js
+    - /frontend/http/script.js
+    - /backend/server.js
 
 ### Core - Second data persistence service
 
 - **AWS service name:** DynamoDB
 - **What data is being stored?:** file metadata. file name, password, timeCracked, user (that the file belongs to).
 - **Why is this service suited to this data?:** this service works appropriately for this data.
-- **Why is are the other services used not suitable for this data?:** TODO
+- **Why is are the other services used not suitable for this data?:** S3 is not suitable for structured data queries, and RDS may introduce unnecessary overhead for simple metadata storage.
 - **Bucket/instance/table name:** n11092505-assessment2-file-metadata
 - **Video timestamp:**
 - **Relevant files:**
-    - /backend/cognito/db.js
+    - /backend/crack/db.js
+    - /backend/crack/crack.js
+    - /backend/server.js
 
 ### Third data service
 
@@ -63,23 +67,31 @@ Core criteria
 - **Video timestamp:**
 - **Relevant files:**
     - /backend/crack/s3.js
+    - /backend/server.js
+    - /frontend/http/script.js
 
 ### In-memory cache
 
 - **ElastiCache instance name:** n11092505-cache
-- **What data is being cached?:** s3 pre-signed urls TODO: might have to cache something else.
-- **Why is this data likely to be accessed frequently?:** users might want to download files multiple times.
+- **What data is being cached?:** s3 pre-signed download urls
+- **Why is this data likely to be accessed frequently?:** Users might want to download files multiple times, allowing quick access without regenerating URLs each time
 - **Video timestamp:**
 - **Relevant files:**
-    -
+    - /backend/server.js
+    - /backend/s3.js
+    - /backend/server.js
 
 ### Core - Statelessness
 
-- **What data is stored within your application that is not stored in cloud data services?:** [eg. intermediate video files that have been transcoded but not stabilised]
-- **Why is this data not considered persistent state?:** [eg. intermediate files can be recreated from source if they are lost]
-- **How does your application ensure data consistency if the app suddenly stops?:** [eg. journal used to record data transactions before they are done.  A separate task scans the journal and corrects problems on startup and once every 5 minutes afterwards. ]
+- **What data is stored within your application that is not stored in cloud data services?:** Access tokens (accessToken), ID tokens (idToken), session identifiers (session), and usernames are stored in the client's localStorage.
+- **Why is this data not considered persistent state?:** This data is stored temporarily on the client side and is not maintained or replicated on the server or in any cloud databases, making it transient and non-persistent.
+- **How does your application ensure data consistency if the app suddenly stops?:** Through the use of stateless JWT tokens for authentication, each request contains all necessary information, this means there is no need for server-side session storage and ensuring consistency if the application stops unexpectedly.
 - **Relevant files:**
-    -
+    - /frontend/http/script.js
+    - /frontend/http/mfa_setup.html
+    - /backend/cognito/authentication.js
+    - /backend/cognito/mfa.js
+    - /backend/cognito/server.js
 
 ### Graceful handling of persistent connections
 
@@ -92,21 +104,27 @@ Core criteria
 ### Core - Authentication with Cognito
 
 - **User pool name:** n11092505-cognito-a2
-- **How are authentication tokens handled by the client?:** TODO
+- **How are authentication tokens handled by the client?:**  After successful authentication, the client stores the accessToken and idToken in localStorage. These tokens are included in the Authorization header as Bearer tokens for subsequent API requests to access protected requests. The client uses these tokens to maintain the user's authenticated state and manage access throughout the application.
 - **Video timestamp:**
 - **Relevant files:**
     - /backend/cognito/authenticate.js
     - /backend/cognito/confirm.js
     - /backend/cognito/signUp.js
     - /backend/cognito/jwt_middleware_verify.js
+    - /frontend/http/script.js
+    - /frontend/http/mfa_setup.html
 
 ### Cognito multi-factor authentication
 
-- **What factors are used for authentication:** password, email code
+- **What factors are used for authentication:** password, google authentictor application (can be added through qr scan or string put)
 - **Video timestamp:**
 - **Relevant files:**
     - /backend/cognito/signUp.js
     - /backend/cognito/confirm.js
+    - /backend/cognito/authenticate.js
+    - /backend/cognito/mfa.js
+    - /frontend/http/script.js
+    - /frontend/http/mfa_setup.html
 
 ### Cognito federated identities
 
@@ -117,10 +135,12 @@ Core criteria
 
 ### Cognito groups
 
-- **How are groups used to set permissions?:** TODO: this could be a potential implementation. to create cognito group. if apart of the admin group provide restart exit code -1 button.
+- **How are groups used to set permissions?:** 1 user "bunn" is assigned to specific Cognito groups, such as "admin", which define their access levels. The users JWT tokens are checked to grant or restrict access to protected routes and functionalities based on their assigned group.
 - **Video timestamp:**
 - **Relevant files:**
-    -
+    - /backend/cognito/jwt_middleware_verify.js
+    - /backend/server.js
+    - /frontend/http/script.js
 
 ### Core - DNS with Route53
 
@@ -130,11 +150,11 @@ Core criteria
 
 ### Custom security groups
 
-- **Security group names:**
-- **Services/instances using security groups:**
+- **Security group names:** n11092505-www-crack, n11092505-www-crack-cache
+- **Services/instances using security groups:** Services: Elasticache, Memcached caches (n11092505-cache). Instances (i-04e8ee01ca7ca72e8 (n11092505-assessment2-bigboy))
 - **Video timestamp:**
 - **Relevant files:**
-    -
+    - Security groups were configured in AWS console
 
 ### Parameter store
 
@@ -145,11 +165,10 @@ Core criteria
 
 ### Secrets manager
 
-- **Secrets names:** n11092505-assessment2
+- **Secrets names:**
 - **Video timestamp:**
-- **Relevant files:** TODO: this might have to be alterd to contain something other then the env access keys
-    - /backend/Dockerfile
-    - /backend/crack/s3/.js
+- **Relevant files:**
+    - 
 
 
 ### Infrastructure as code
