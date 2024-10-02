@@ -31,7 +31,7 @@ Core criteria
 - **Why is this service suited to this data?:** s3 allows for many different types of files, which makes the service more user friendly with the files is can accept. 
 - **Why is are the other services used not suitable for this data?:** AWS services like DynamoDB, are less suitable for storing unstructured data like text files due to their focus on structured data handling and higher management requirements.
 - **Bucket/instance/table name:** n11092505-assessment-2
-- **Video timestamp:**
+- **Video timestamp:** 0 - 0:30
 - **Relevant files:**
     - /backend/crack/s3.js
     - /frontend/http/script.js
@@ -44,7 +44,7 @@ Core criteria
 - **Why is this service suited to this data?:** this service works appropriately for this data.
 - **Why is are the other services used not suitable for this data?:** S3 is not suitable for structured data queries, and RDS may introduce unnecessary overhead for simple metadata storage.
 - **Bucket/instance/table name:** n11092505-assessment2-file-metadata
-- **Video timestamp:**
+- **Video timestamp:** 0:33 - 1:21
 - **Relevant files:**
     - /backend/crack/db.js
     - /backend/crack/crack.js
@@ -64,7 +64,7 @@ Core criteria
 ### S3 Pre-signed URLs
 
 - **S3 Bucket names:** n11092505-assessment-2 (the object names are user specific)
-- **Video timestamp:**
+- **Video timestamp:** 1:21 - 2:05
 - **Relevant files:**
     - /backend/crack/s3.js
     - /backend/server.js
@@ -75,7 +75,7 @@ Core criteria
 - **ElastiCache instance name:** n11092505-cache
 - **What data is being cached?:** s3 pre-signed download urls
 - **Why is this data likely to be accessed frequently?:** Users might want to download files multiple times, allowing quick access without regenerating URLs each time
-- **Video timestamp:**
+- **Video timestamp:** 2:05 - 3:23
 - **Relevant files:**
     - /backend/server.js
     - /backend/s3.js
@@ -105,7 +105,7 @@ Core criteria
 
 - **User pool name:** n11092505-cognito-a2
 - **How are authentication tokens handled by the client?:**  After successful authentication, the client stores the accessToken and idToken in localStorage. These tokens are included in the Authorization header as Bearer tokens for subsequent API requests to access protected requests. The client uses these tokens to maintain the user's authenticated state and manage access throughout the application.
-- **Video timestamp:**
+- **Video timestamp:** 3:23 - 4:58
 - **Relevant files:**
     - /backend/cognito/authenticate.js
     - /backend/cognito/confirm.js
@@ -117,7 +117,7 @@ Core criteria
 ### Cognito multi-factor authentication
 
 - **What factors are used for authentication:** password, google authentictor application (can be added through qr scan or string put)
-- **Video timestamp:**
+- **Video timestamp:** 4:58 - 5:11
 - **Relevant files:**
     - /backend/cognito/signUp.js
     - /backend/cognito/confirm.js
@@ -136,7 +136,7 @@ Core criteria
 ### Cognito groups
 
 - **How are groups used to set permissions?:** 1 user "bunn" is assigned to specific Cognito groups, such as "admin", which define their access levels. The users JWT tokens are checked to grant or restrict access to protected routes and functionalities based on their assigned group.
-- **Video timestamp:**
+- **Video timestamp:** 5:11 - 6:01
 - **Relevant files:**
     - /backend/cognito/jwt_middleware_verify.js
     - /backend/server.js
@@ -145,20 +145,20 @@ Core criteria
 ### Core - DNS with Route53
 
 - **Subdomain** cracker.cab432.com
-- **Video timestamp:**
+- **Video timestamp:** 6:01 - 6:36
 
 
 ### Custom security groups
 
 - **Security group names:** n11092505-www-crack, n11092505-www-crack-cache
 - **Services/instances using security groups:** Services: Elasticache, Memcached caches (n11092505-cache). Instances (i-04e8ee01ca7ca72e8 (n11092505-assessment2-bigboy))
-- **Video timestamp:**
+- **Video timestamp:** 6:36 - 7:36
 - **Relevant files:**
     - Security groups were configured in AWS console
 
 ### Parameter store
 
-- **Parameter names:** [eg. n1234567/base_url]
+- **Parameter names:**
 - **Video timestamp:**
 - **Relevant files:**
     -
