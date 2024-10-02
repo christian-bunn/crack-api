@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { signUpUser } = require('./cognito/signUp');
 const { confirmSignUp } = require('./cognito/confirm');
 const { authenticateUser } = require('./cognito/authenticate');
@@ -9,6 +10,13 @@ const { associateSoftwareToken, verifySoftwareToken, setUserMFAPreference } = re
 
 const app = express();
 app.use(express.json());
+
+// Use CORS middleware
+app.use(cors({
+  origin: ['http://cracker.cab432.com', 'http://127.0.0.1:8080'], // Replace with your frontend application's origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 // Manually set CORS headers
 app.use((req, res, next) => {

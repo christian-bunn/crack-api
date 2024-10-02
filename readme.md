@@ -12,3 +12,14 @@ curl --upload-file '/home/c/Projects/crack-api/readme.md' ''
 curl -v -X PUT -T /home/c/Projects/crack-api/readme.md ""
 
 x=5; y=5; for i in $(seq 1 $x); do hex_string=$(openssl rand -hex $((y/2))); echo -n "$hex_string" | sha512sum | cut -f1 -d" " > "secret-$hex_string.hash"; done
+
+
+To run project:
+
+Start Instance on aws
+
+cd crack-api
+
+./setup.sh
+
+docker compose up
