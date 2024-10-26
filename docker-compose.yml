@@ -1,3 +1,4 @@
+version: "3"
 services:
   frontend:
     restart: unless-stopped
@@ -5,9 +6,10 @@ services:
     build: ./frontend
     ports:
       - "80:80"
-  backend:
-    restart: unless-stopped
-    image: 901444280953.dkr.ecr.ap-southeast-2.amazonaws.com/n11092505-my-assignment-repo:backend
-    build: ./backend
-    ports:
-      - "3000:3000"
+  
+  # backend:
+  #   restart: unless-stopped
+  #   image: 901444280953.dkr.ecr.ap-southeast-2.amazonaws.com/n11092505-my-assignment-repo:backend
+  #   build: ./backend
+  #   ports:
+  #     - "3000:3000"

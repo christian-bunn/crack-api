@@ -1,0 +1,14 @@
+version: 1
+task_definition:
+  ecs_network_mode: 'awsvpc'
+  task_execution_role: 'Execution-Role-CAB432-ECS'
+  task_size:
+    mem_limit: 1.0GB
+    cpu_limit: 512
+
+run_params:
+  network_configuration:
+    awsvpc_configuration:
+      subnets:
+        - "subnet-05a3b8177138c8b14"
+      assign_public_ip: "ENABLED"
