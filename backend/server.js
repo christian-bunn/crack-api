@@ -7,6 +7,8 @@ const { uploadFile, downloadFile, listFiles } = require('./crack/s3');
 const { authenticateMiddleware } = require('./cognito/jwt_middleware_verify');
 const { crackFile } = require('./crack/crack');
 const { associateSoftwareToken, verifySoftwareToken, setUserMFAPreference } = require('./cognito/mfa');
+const { addCrackjobToQueue } = require('./sqs/sqs');
+const { randomId } = require('./crack/db');
 
 const app = express();
 app.use(express.json());
@@ -104,9 +106,17 @@ app.get('/download/:filename', authenticateMiddleware, async (req, res) => {
 // crack API route
 app.post('/crack/start', authenticateMiddleware, async (req, res) => {
   try {
-    const folder = req.user.sub;
     const { fileName, mask } = req.body;
-    await crackFile(folder, fileName, mask, res);
+    const jobId = randomId(10);
+    const user = req.user.sub;
+    await putJobInDynamoDB({ 
+      user: user,
+      jobId: jobId,
+      file: fileName,
+      mask: mask,
+    });
+    await addCrackjobToQueue({ jobId, user });
+    // await crackFile(folder, fileName, mask, res);
   } catch (error) {
     console.error('Error cracking', error);
     res.status(500).json({ message: 'Failed to crack' });

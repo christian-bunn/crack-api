@@ -5,7 +5,13 @@ services:
     image: 901444280953.dkr.ecr.ap-southeast-2.amazonaws.com/n11092505-my-assignment-repo:frontend
     build: ./frontend
     ports:
-      - "80:80"
+      - "8080:8080"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: /aws/ecs/containerlogs
+        awslogs-region: ap-southeast-2
+        awslogs-stream-prefix: n11092505-assessment-3-frontend
 
   # backend:
   #   restart: unless-stopped

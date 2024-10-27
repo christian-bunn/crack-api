@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Id": "__default_policy_ID",
+  "Statement": [
+    {
+      "Sid": "__owner_statement",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "901444280953"
+      },
+      "Action": [
+        "SQS:*"
+      ],
+      "Resource": "arn:aws:sqs:ap-southeast-2:901444280953:n11092505-crack-queue"
+    }
+  ]
+}
