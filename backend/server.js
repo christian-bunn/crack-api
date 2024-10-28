@@ -104,23 +104,26 @@ app.get('/download/:filename', authenticateMiddleware, async (req, res) => {
 
 // crack API route
 app.post('/crack/start', authenticateMiddleware, async (req, res) => {
+  let job = null;
   try {
     const { fileName, mask } = req.body;
     const jobId = randomId(10);
     const user = req.user.sub;
-    await putJobInDynamoDB({ 
+    job = { 
       user: user,
       jobId: jobId,
       file: fileName,
       mask: mask,
-    });
+      status: 'submitted'
+    }
+    await putJobInDynamoDB(job);
     await addCrackjobToQueue({ jobId, user });
     // await crackFile(folder, fileName, mask, res);
   } catch (error) {
     console.error('Error cracking', error);
     res.status(500).json({ message: 'Failed to crack' });
   }
-  res.status(200).json({ });
+  res.status(200).json(job);
 });
 
 // middleware function to check if user is an admin

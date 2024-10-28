@@ -20,6 +20,7 @@ const putJobInDynamoDB = async (data) => {
         console.log("Put command response:", response);
       } catch (err) {
         console.log(err);
+        throw err;
       }
 };
 
