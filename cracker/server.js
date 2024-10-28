@@ -1,5 +1,12 @@
+const SQS = require("@aws-sdk/client-sqs");
 const sqsQueueUrl =
   "https://sqs.ap-southeast-2.amazonaws.com/901444280953/n11092505-crack-queue";
+  const client = new SQS.SQSClient({
+    region: "ap-southeast-2",
+  });
+
+const { queryJobDynamoDB} = require('./crack/db');
+const { crackFile} = require('./crack/crack')
 
 const runCrackJob = async () => {
   // check sqs for jobs (get 1 job)
@@ -24,16 +31,7 @@ const runCrackJob = async () => {
     console.log("no user");
     return;
   }
-  // get document from dynamodb
-  const command = new DynamoDBLib.GetCommand({
-    TableName: tableName,
-    Key: {
-      user: user,
-      jobId: jobId,
-    },
-  });
-  const response = await docClient.send(command);
-  const job = response.Item;
+  const job = await queryJobDynamoDB(user, jobId);
 
   // set status of job to started and downloading file
 
@@ -53,11 +51,13 @@ const runCrackJob = async () => {
 };
 
 async function main() {
-  // repeat until no jobs
-  try {
-    await runCrackJob();
-  } catch (e) {
-    console.error(e);
+  while (true) {
+    // repeat until no jobs
+    try {
+      await runCrackJob();
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 

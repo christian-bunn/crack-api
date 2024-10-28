@@ -1,7 +1,7 @@
 const { spawn } = require("node:child_process");
 const S3 = require("@aws-sdk/client-s3");
 const fs = require("fs");
-const { putItemInDynamoDB } = require("./db");
+const { putJobInDynamoDB } = require("./db");
 
 // defining a client for sending commands to S3
 const s3Client = new S3.S3Client({ region: "ap-southeast-2" });
@@ -23,7 +23,7 @@ const crackFile = async (job) => {
   });
   const { Body } = await s3Client.send(command);
 
-  await putItemInDynamoDB({
+  await putJobInDynamoDB({
     ...job,
     status: "downloading"
   });
@@ -34,7 +34,7 @@ const crackFile = async (job) => {
       .on("close", () => resolve());
   });
 
-  await putItemInDynamoDB({
+  await putJobInDynamoDB({
     ...job,
     status: "cracking"
   });
@@ -76,7 +76,7 @@ const crackFile = async (job) => {
       console.log(`child process exited with code ${code}`);
       if (code === 0) {
         const crackedPassword = fs.readFileSync(localOutputFileName, "utf8");
-        await putItemInDynamoDB({
+        await putJobInDynamoDB({
           ...job,
           status: "success",
           password: crackedPassword,
@@ -85,13 +85,13 @@ const crackFile = async (job) => {
         // delete the local files
         fs.unlinkSync(localInputFileName);
         fs.unlinkSync(localOutputFileName);
-        resolve();
       } else {
-        await putItemInDynamoDB({
+        await putJobInDynamoDB({
           ...job,
           status: "error",
         });
       }
+      resolve();
     });
   });
 };

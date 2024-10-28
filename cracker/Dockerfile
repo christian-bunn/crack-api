@@ -14,7 +14,6 @@ COPY ./package-lock.json .
 # install dependencies
 RUN npm ci
 
-COPY ./cognito ./cognito
 COPY ./crack ./crack
 COPY ./server.js ./server.js
 

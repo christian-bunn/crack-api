@@ -4,7 +4,6 @@ FROM node:22
 # and install dependencies
 RUN apt-get update \
     && apt-get install -y curl \
-    && apt install -y hashcat \
     && apt-get -y autoclean
 
 WORKDIR /backend

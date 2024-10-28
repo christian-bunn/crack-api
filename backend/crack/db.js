@@ -3,7 +3,7 @@ const DynamoDB = require("@aws-sdk/client-dynamodb");
 const DynamoDBLib = require("@aws-sdk/lib-dynamodb");
 const client = new DynamoDB.DynamoDBClient({ region: "ap-southeast-2" });
 const docClient = DynamoDBLib.DynamoDBDocumentClient.from(client);
-const tableName = 'n11092505-assessment3-job-metadata';
+const tableName = 'n11092505-assessment3-crack-job';
 
 // function for putting an object in dynamodb
 const putJobInDynamoDB = async (data) => {
