@@ -11,4 +11,6 @@ run_params:
     awsvpc_configuration:
       subnets:
         - "subnet-05a3b8177138c8b14"
+      security_groups:
+        - "sg-01f062ec51bf04e7a"
       assign_public_ip: "ENABLED"

@@ -13,11 +13,11 @@ const app = express();
 app.use(express.json());
 
 // CORS middleware
-app.use(cors({
-  origin: ['http://cracker.cab432.com', 'http://127.0.0.1:8080'], // Replace with your frontend application's origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+// app.use(cors({
+//   origin: ['http://cracker.cab432.com', 'http://127.0.0.1:8080'], // Replace with your frontend application's origin
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+// }));
 
 // manually setting the headers for consistent cors behaviour
 app.use((req, res, next) => {
