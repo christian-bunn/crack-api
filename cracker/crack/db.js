@@ -47,7 +47,7 @@ const randomId = function(length = 6) {
 };
 
 module.exports = {
-    putItemInDynamoDB,
+    putJobInDynamoDB,
     queryDynamoDB,
     randomId,
 };

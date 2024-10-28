@@ -16,6 +16,7 @@ RUN npm ci
 
 COPY ./cognito ./cognito
 COPY ./crack ./crack
+COPY ./sqs ./sqs
 COPY ./server.js ./server.js
 
 ENV AWS_ACCESS_KEY_ID ""

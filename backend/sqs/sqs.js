@@ -19,25 +19,25 @@ async function addCrackjobToQueue(data) {
    console.log("Sending a message", response);
 
    // Receive a message from the queue
-   const receiveCommand = new SQS.ReceiveMessageCommand({
-      MaxNumberOfMessages: 1,
-      QueueUrl: sqsQueueUrl,
-      WaitTimeSeconds: 20, // how long to wait for a message before returning if none.
-      VisibilityTimeout: 20, // overrides the default for the queue?
-   });
+   // const receiveCommand = new SQS.ReceiveMessageCommand({
+   //    MaxNumberOfMessages: 1,
+   //    QueueUrl: sqsQueueUrl,
+   //    WaitTimeSeconds: 20, // how long to wait for a message before returning if none.
+   //    VisibilityTimeout: 20, // overrides the default for the queue?
+   // });
 
 //    const receiveResponse = await client.send(receiveCommand);
 //    console.log("Receiving a message", receiveResponse);
 
-   // If there are no messages then you'll still get a result back.
-   Messages = receiveResponse.Messages;
-   if (!Messages) {
-      console.log("No messages");
-      return;
-   }
+   // // If there are no messages then you'll still get a result back.
+   // Messages = receiveResponse.Messages;
+   // if (!Messages) {
+   //    console.log("No messages");
+   //    return;
+   // }
 
-   // Retrieve the first message from the body
-   console.log("Message contents:", Messages[0].Body);
+   // // Retrieve the first message from the body
+   // console.log("Message contents:", Messages[0].Body);
 
 //    // Delete the message after dealt with.
 //    const deleteCommand = new SQS.DeleteMessageCommand({
