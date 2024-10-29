@@ -553,3 +553,43 @@ function promptMfaCode(username, password, session) {
     }
   });
 }
+
+// Function to list user jobs
+document.getElementById('refreshJobsButton').addEventListener('click', listUserJobs);
+async function listUserJobs() {
+  const jobList = document.getElementById('jobList'); // Ensure there's an element with this ID
+
+  if (!jobList) return; // Exit if element does not exist
+
+  jobList.innerHTML = ''; // Clear existing content
+
+  const accessToken = localStorage.getItem('accessToken');
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/userJobs`, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + accessToken,
+      },
+    });
+
+    const jobs = await response.json();
+
+    if (response.ok) {
+      if (jobs.length === 0) {
+        jobList.textContent = 'No jobs found for this user.';
+      } else {
+        jobs.forEach(job => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `Job ID: ${job.jobId}, File: ${job.file}, Mask: ${job.mask}, Status: ${job.status}`;
+          jobList.appendChild(listItem);
+        });
+      }
+    } else {
+      jobList.textContent = 'Failed to retrieve user jobs.';
+    }
+  } catch (error) {
+    console.error('Error listing user jobs:', error);
+    jobList.textContent = 'An error occurred while listing user jobs.';
+  }
+}

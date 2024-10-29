@@ -47,8 +47,30 @@ const randomId = function(length = 6) {
   return Math.random().toString(36).substring(2, length+2);
 };
 
+const queryUserJobsDynamoDB = async (user) => {
+  const command = new DynamoDBLib.QueryCommand({
+    TableName: tableName,
+    IndexName: 'user-index', // Assumes a GSI on the 'user' attribute
+    KeyConditionExpression: '#user = :user',
+    ExpressionAttributeNames: {
+      '#user': 'user',
+    },
+    ExpressionAttributeValues: {
+      ':user': user,
+    },
+  });
+  try {
+    const response = await docClient.send(command);
+    return response.Items;
+  } catch (err) {
+    console.log('Error querying user jobs:', err);
+    throw err;
+  }
+};
+
 module.exports = {
     putJobInDynamoDB,
     queryDynamoDB,
     randomId,
+    queryUserJobsDynamoDB,
 };

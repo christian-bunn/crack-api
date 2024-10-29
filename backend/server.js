@@ -8,6 +8,7 @@ const { authenticateMiddleware } = require('./cognito/jwt_middleware_verify');
 const { associateSoftwareToken, verifySoftwareToken, setUserMFAPreference } = require('./cognito/mfa');
 const { addCrackjobToQueue } = require('./sqs/sqs');
 const { randomId, putJobInDynamoDB } = require('./crack/db');
+const { queryUserJobsDynamoDB } = require('./crack/db');
 
 const app = express();
 app.use(express.json());
@@ -177,6 +178,19 @@ app.post('/cognito/associateMFA', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// user jobs API route
+app.get('/userJobs', authenticateMiddleware, async (req, res) => {
+  try {
+    const user = req.user.sub;
+    const jobs = await queryUserJobsDynamoDB(user);
+    res.json(jobs);
+  } catch (error) {
+    console.error('Error retrieving user jobs:', error);
+    res.status(500).json({ message: 'Failed to retrieve user jobs.' });
+  }
+});
+
 
 // Status endpoint to check if server is running
 app.get('/status', (req, res) => {

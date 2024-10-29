@@ -28,3 +28,13 @@ http-server -c1
 ####Run backend individually:
 cd into backend directory
 node server.js
+
+
+
+
+When wanting to upload to ecr do the following:
+git add -A
+git commit -m ""
+git push
+./push-to-ecr.sh
+./up-task.sh
