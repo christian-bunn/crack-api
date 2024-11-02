@@ -38,3 +38,11 @@ git commit -m ""
 git push
 ./push-to-ecr.sh
 ./up-task.sh
+
+if denied: Your authorization token has expired. Reauthenticate and try again. run:
+aws configure sso
+./login.sh
+
+
+to run on local:
+

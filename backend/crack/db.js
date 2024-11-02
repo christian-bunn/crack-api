@@ -3,7 +3,7 @@ const DynamoDB = require("@aws-sdk/client-dynamodb");
 const DynamoDBLib = require("@aws-sdk/lib-dynamodb");
 const client = new DynamoDB.DynamoDBClient({ region: "ap-southeast-2" });
 const docClient = DynamoDBLib.DynamoDBDocumentClient.from(client);
-const tableName = 'n11092505-assessment3-crack-job';
+const tableName = 'n11092505-assessment3-job-metadata-v2';
 
 // function for putting an object in dynamodb
 const putJobInDynamoDB = async (data) => {
@@ -48,24 +48,20 @@ const randomId = function(length = 6) {
 };
 
 const queryUserJobsDynamoDB = async (user) => {
-  const command = new DynamoDBLib.QueryCommand({
-    TableName: tableName,
-    IndexName: 'user-index', // Assumes a GSI on the 'user' attribute
-    KeyConditionExpression: '#user = :user',
-    ExpressionAttributeNames: {
-      '#user': 'user',
-    },
-    ExpressionAttributeValues: {
-      ':user': user,
-    },
-  });
-  try {
+    // get document from dynamodb
+    const command = new DynamoDBLib.ScanCommand({
+      TableName: tableName, 
+      FilterExpression: '#user = :user',
+      ExpressionAttributeNames: {
+        '#user': 'user',
+      },
+      ExpressionAttributeValues: {
+        ':user': user,
+      },
+    });
     const response = await docClient.send(command);
-    return response.Items;
-  } catch (err) {
-    console.log('Error querying user jobs:', err);
-    throw err;
-  }
+    const job = response.Items;
+    return job;
 };
 
 module.exports = {

@@ -3,7 +3,7 @@ const DynamoDB = require("@aws-sdk/client-dynamodb");
 const DynamoDBLib = require("@aws-sdk/lib-dynamodb");
 const client = new DynamoDB.DynamoDBClient({ region: "ap-southeast-2" });
 const docClient = DynamoDBLib.DynamoDBDocumentClient.from(client);
-const tableName = 'n11092505-assessment3-crack-job';
+const tableName = 'n11092505-assessment3-job-metadata-v2';
 
 // function for putting an object in dynamodb
 const putJobInDynamoDB = async (data) => {
@@ -25,10 +25,10 @@ const putJobInDynamoDB = async (data) => {
 
 // function for making a query to dynamodb
 const queryJobDynamoDB = async (user, jobId) => {
+    console.log(user, jobId);
     // get document from dynamodb
     const command = new DynamoDBLib.ScanCommand({
       TableName: tableName,
-      IndexName: 'user-jobId-index', // Specify the GSI name here
       FilterExpression: '#user = :user and #jobId = :jobId',
       ExpressionAttributeNames: {
         '#user': 'user',
@@ -38,7 +38,6 @@ const queryJobDynamoDB = async (user, jobId) => {
         ':user': user,
         ':jobId': jobId,
       },
-      Limit: 1, // Limit the results to 1 item
     });
     const response = await docClient.send(command);
     const job = response.Items?.[0];
