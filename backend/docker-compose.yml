@@ -1,0 +1,15 @@
+version: "3"
+services:
+  backend:
+    restart: unless-stopped
+    image: 901444280953.dkr.ecr.ap-southeast-2.amazonaws.com/n11092505-my-assignment-repo:backend
+    build: ./backend
+    ports:
+      - "3000:3000"
+    env_file: "../.env"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: /aws/ecs/containerlogs
+        awslogs-region: ap-southeast-2
+        awslogs-stream-prefix: n11092505-assessment-3-backend
