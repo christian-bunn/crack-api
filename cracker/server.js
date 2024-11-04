@@ -25,10 +25,7 @@ const runCrackJob = async () => {
   );
   if (!jobId) {
     console.log("no job id");
-    if (receiveResponse?.Messages?.length == 0) {
-      // exit success as we have done a good job :)
-      exit(0)
-    }
+    exit(0);
     return;
   }
   if (!user) {
