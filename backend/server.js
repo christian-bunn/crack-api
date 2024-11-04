@@ -9,16 +9,17 @@ const { associateSoftwareToken, verifySoftwareToken, setUserMFAPreference } = re
 const { addCrackjobToQueue } = require('./sqs/sqs');
 const { randomId, putJobInDynamoDB } = require('./crack/db');
 const { queryUserJobsDynamoDB } = require('./crack/db');
+const { startCrackerTask } = require('./crack/ecs');
 
 const app = express();
 app.use(express.json());
 
 // CORS middleware
-// app.use(cors({
-//   origin: ['http://cracker.cab432.com', 'http://127.0.0.1:8080'], // Replace with your frontend application's origin
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//   allowedHeaders: ['Content-Type', 'Authorization'],
-// }));
+app.use(cors({
+  origin: ['https://cracker.cab432.com', 'https://cracker.cab432.com:3000', 'http://127.0.0.1:8080'], // Replace with your frontend application's origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 // manually setting the headers for consistent cors behaviour
 app.use((req, res, next) => {
@@ -119,12 +120,12 @@ app.post('/crack/start', authenticateMiddleware, async (req, res) => {
     }
     await putJobInDynamoDB(job);
     await addCrackjobToQueue({ jobId, user });
-    // await crackFile(folder, fileName, mask, res);
+    await startCrackerTask();
+    res.status(200).json(job);
   } catch (error) {
     console.error('Error cracking', error);
     res.status(500).json({ message: 'Failed to crack' });
   }
-  res.status(200).json(job);
 });
 
 // middleware function to check if user is an admin
