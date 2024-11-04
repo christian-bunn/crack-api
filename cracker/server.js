@@ -25,8 +25,7 @@ const runCrackJob = async () => {
   );
   if (!jobId) {
     console.log("no job id");
-    exit(0);
-    return;
+    process.exit(0);
   }
   if (!user) {
     console.log("no user");
